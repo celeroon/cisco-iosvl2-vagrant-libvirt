@@ -1,50 +1,43 @@
 Vagrant.configure("2") do |config|
-  # Define the VM named 'sw1'
   config.vm.define "sw1" do |node|
-    # Specify the Vagrant box to use
+    node.vm.guest = :freebsd
     node.vm.box = "cisco-iosvl2"
-
-    # Prevent Vagrant from inserting its default SSH key
-    node.ssh.insert_key = false
-
-    # Disable the default shared folder synchronization
+    node.vm.box_version = "2025"
+    node.nfs.verify_installed = false
     node.vm.synced_folder ".", "/vagrant", disabled: true
+    node.vm.allow_hosts_modification = false
 
-    # Configure the primary network interface and VM resources
-    node.vm.provider :libvirt do |domain|
-      # Use the 'default' libvirt management network
-      domain.management_network_name = 'default'
-
-      # Set the memory allocated to the VM (in MB)
-      domain.memory = 512
-
-      # Set the number of CPUs allocated to the VM
-      domain.cpus = 1
-
-      # Use the e1000 NIC model for the primary interface
-      domain.nic_model_type = "e1000"
-
-      # Disable graphical display for the VM
-      domain.graphics_type = "none"
-
-      # Set the video type (required even if graphics are disabled)
-      domain.video_type = "cirrus"
-
-      # Use virtio as the disk bus for better performance
-      domain.disk_bus = "virtio"
+    node.vm.provider :libvirt do |libvirt|
+      libvirt.management_network_name = 'default'
+      # libvirt.management_network_address = "192.168.0.0/24"
+      # libvirt.management_network_mac = "52:54:00:00:01:25"
+      libvirt.management_network_keep = true
+      libvirt.memory = 1024
+      libvirt.cpus = 1
+      libvirt.nic_model_type = "e1000"
+      libvirt.graphics_type = "none"
+      libvirt.video_type = "cirrus"
+      libvirt.disk_bus = "virtio"
     end
 
-    # Add an additional private network interface for the VM
+    # gi1/0/1
+    node.vm.network "public_network", 
+      bridge: "virbr2",
+      type: "bridge",
+      dev: "virbr2",
+      auto_config: false
+    
+    # gi1/0/2
     node.vm.network :private_network,
-      :libvirt__iface_name => "g0/1",               # Set the name of the interface in libvirt
-      :libvirt__tunnel_type => "udp",              # Specify tunnel type (UDP in this case)
-      :libvirt__tunnel_local_ip => "127.1.1.1",    # Set the local IP for the tunnel
-      :libvirt__tunnel_local_port => "10001",      # Set the local port for the tunnel
-      :libvirt__tunnel_ip => "127.1.2.1",          # Set the remote tunnel IP
-      :libvirt__tunnel_port => "10001",            # Set the remote tunnel port
-      auto_config: false                           # Prevent Vagrant from automatically configuring the interface
+      :libvirt__iface_name => "g0/1",
+      :libvirt__tunnel_type => "udp",
+      :libvirt__tunnel_local_ip => "127.1.1.1",
+      :libvirt__tunnel_local_port => "10001",
+      :libvirt__tunnel_ip => "127.1.1.2",
+      :libvirt__tunnel_port => "10001",
+      auto_config: false
 
-    # Set SSH credentials for the VM
+    node.ssh.insert_key = false
     config.ssh.username = "vagrant"
     config.ssh.password = "vagrant"
   end

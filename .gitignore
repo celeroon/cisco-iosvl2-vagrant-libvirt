@@ -1,4 +1,6 @@
+packer_cache/
+builds/*
+!builds/.gitkeep
 .vagrant/
-cisco-iosvl2-console.explog
-build/
-builds/
+*.box
+*.explog

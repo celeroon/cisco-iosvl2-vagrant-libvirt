@@ -1,0 +1,15 @@
+{
+    "name": "cisco-iosvl2",
+    "description": "This box contains the Cisco IOSv L2 Switch.",
+    "versions": [
+      {
+        "version": "VER",
+        "providers": [
+          {
+            "name": "libvirt",
+            "url": "file:///var/lib/libvirt/images/cisco-iosvl2-VER.box"
+          }
+        ]
+      }
+    ]
+  }

@@ -1,0 +1,32 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Use Vagrant's default insecure key
+  config.ssh.insert_key = false
+  # Enable deprecated OpenSSH options
+  config.ssh.extra_args = [
+    "-o", "HostkeyAlgorithms=+ssh-rsa",
+    "-o", "PubkeyAcceptedAlgorithms=+ssh-rsa",
+    "-o", "KexAlgorithms=+diffie-hellman-group-exchange-sha1"
+  ]
+  # Set timeout to 2 mins
+  config.vm.boot_timeout = 120
+  # Disable default host <-> guest synced folder
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  # Disable fstab modification
+  config.vm.allow_fstab_modification = false
+  # Disable hosts modification
+  config.vm.allow_hosts_modification = false
+  # Set guest OS type to disable autodetection
+  config.vm.guest = :freebsd
+
+  config.vm.provider :libvirt do |libvirt|
+    libvirt.cpus = 1
+    libvirt.features = ['apic']
+    libvirt.memory = 1024
+    libvirt.disk_driver :cache => 'none'
+    libvirt.nic_model_type = 'e1000'
+    libvirt.graphics_type = 'none'
+  end
+end

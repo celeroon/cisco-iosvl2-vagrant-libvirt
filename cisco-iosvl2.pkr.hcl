@@ -75,7 +75,7 @@ source "qemu" "cisco-iosvl2" {
   output_directory = "${var.out_dir}"
   shutdown_timeout = "5m"
   qemuargs = [
-    ["-cdrom", "/var/lib/libvirt/images/cisco-iosvl2.qcow2"],
+    ["-cdrom", "${var.image_path}/${var.image_name}"],
     ["-nographic"],
     ["-serial", "telnet:127.0.0.1:${var.telnet_port},server,nowait"],
     ["-boot", "d"],
